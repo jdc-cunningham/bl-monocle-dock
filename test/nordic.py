@@ -21,7 +21,6 @@ UART_SERVICE_UUID = "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 UART_RX_CHAR_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 UART_TX_CHAR_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
-
 # TIP: you can get this function and more from the ``more-itertools`` package.
 def sliced(data: bytes, n: int) -> Iterator[bytes]:
     """
@@ -31,7 +30,7 @@ def sliced(data: bytes, n: int) -> Iterator[bytes]:
     return takewhile(len, (data[i : i + n] for i in count(0, n)))
 
 
-async def uart_terminal():
+async def repl_api():
     """This is a simple "terminal" program that uses the Nordic Semiconductor
     (nRF) UART service. It reads from stdin and sends each line of data to the
     remote device. Any data received from the device is printed to stdout.
@@ -84,24 +83,22 @@ async def uart_terminal():
 
             # some devices, like devices running MicroPython, expect Windows
             # line endings (uncomment line below if needed)
-            # data = data.replace(b"\n", b"\r\n")
+            # data = data.replace(b"\r\n", b"")
 
             # Writing without response requires that the data can fit in a
             # single BLE packet. We can use the max_write_without_response_size
             # property to split the data into chunks that will fit.
 
             # for s in sliced(data, rx_char.max_write_without_response_size):
-            res = await client.write_gatt_char(rx_char, b'\x03\x01', response=True)
-            await asyncio.sleep(0.5)
-            print(res)
-
+            print(data)
+            await client.write_gatt_char(rx_char, b'\x03\x01')
 
             print("sent:", data)
 
 
 if __name__ == "__main__":
     try:
-        asyncio.run(uart_terminal())
+        asyncio.run(repl_api())
     except asyncio.CancelledError:
         # task is cancelled on disconnect, so we ignore this error
         pass

@@ -24,27 +24,17 @@ img = Image.open('monocle_200.jpg')
 img = ImageTk.PhotoImage(img)
 canvas.create_image(50, 50, anchor=NW, image=img)
 
-#Define a function to show a message
-# def myclick():
-#    message= "Hello "+ entry.get()
-#    label= Label(frame, text= message, font= ('Times New Roman', 14, 'italic'))
-#    entry.delete(0, 'end')
-#    label.pack(pady=30)
-
 #Creates a Frame
-frame = LabelFrame(win, width= 300, height= 50, bd=1, text='Monocle status:')
+frame = LabelFrame(win, width= 300, height= 50, bd=1, text='Monocle status:', bg='#282828', fg='#AAFF00')
 frame.pack(fill='both', expand='yes')
-frame.pack_propagate(True) # False keeps width
+frame.pack_propagate() # False keeps width
 
-status_text = Label(frame, text='Disconnected...')
+status_text = Label(frame, text='Connecting...', anchor='sw')
+status_text.place(relx=0, rely=50, anchor='sw') # lol NW
 status_text.pack()
 
-#Create an Entry widget in the Frame
-# entry = ttk.Entry(frame, width= 40)
-# entry.insert(INSERT, "Enter Your Name")
-# entry.pack()
-#Create a Button
-# ttk.Button(win, text= "Click", command= myclick).pack(pady=20)
+def clean_res(res_str):
+  return res_str.replace('OK', '').replace('\x04', '').replace('>', '')
 
 def app_logic():
   global ble
@@ -59,17 +49,18 @@ def app_logic():
     time.sleep(2)
     ble.send_bytes_data = b'import device;print(device.VERSION)\x04'
     time.sleep(2)
-    status_text.config(text = ble.res.decode('utf-8').replace('OK', '').replace('\x04', '').replace('>', ''))
+    status_text.config(text = clean_res(ble.res.decode('utf-8')))
     win.update()
     print('sent all')
 
+# handle closing Monocle Dock
 def on_close():
   global ble
 
   ble.disconnect = True # stops connection loop
   win.destroy()
 
-win.after(1000, app_logic)
+win.after(1000, app_logic) # run app logic after desktop app renders
 win.protocol("WM_DELETE_WINDOW", on_close)
 
 # render UI

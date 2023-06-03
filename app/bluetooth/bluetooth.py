@@ -71,7 +71,7 @@ class Bluetooth():
             await client.write_gatt_char(self.rx_char, self.send_bytes_data)
             await asyncio.sleep(0.5)
             self.send_bytes_data = None
-          time.sleep(1)
+          time.sleep(1) # slow this loop down, does mean longer response time
 
   def start(self):
     try:

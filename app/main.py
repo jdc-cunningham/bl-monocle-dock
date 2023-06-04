@@ -50,14 +50,14 @@ def update_status():
   
   if (ble.res == None):
     print('no data from monocle')
-    ble.res = {
+    ble.res = json.dumps({ # dumb
       "charging": False,
       "ram": 0,
       "storage": 0,
       "firmware": 'v0.0.0',
       "batt": 0,
       "uptime": 0
-    }
+    })
 
   status = json.loads(clean_res(ble.res.decode('utf-8')))
   ble.res = None # reset

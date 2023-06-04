@@ -1,6 +1,7 @@
 # https://www.tutorialspoint.com/converting-tkinter-program-to-exe-file
 # https://www.tutorialspoint.com/python/tk_labelframe.htm
 
+import os
 import json
 import time
 
@@ -12,6 +13,15 @@ from PIL import Image, ImageTk
 
 ble = None
 stop_app = False
+
+# https://stackoverflow.com/a/51266275/2710227
+def resource_path(relative_path):
+  try:
+    base_path = sys._MEIPASS
+  except Exception:
+    base_path = os.path.abspath(".")
+
+  return os.path.join(base_path, relative_path)
 
 def clean_res(res_str):
   return res_str.replace('OK', '').replace('\x04', '').replace('>', '')
@@ -84,12 +94,12 @@ win = Tk()
 win.title('Monocle Dock')
 win.geometry("300x400")
 win.bg = 'white'
-win.iconbitmap('monocle_24.ico')
+win.iconbitmap(resource_path('monocle_24.ico'))
 
 canvas = Canvas(win, width=300, height=280, bg='white') # related height
 canvas.pack()
 
-img = Image.open('monocle_200.jpg')
+img = Image.open(resource_path('monocle_200.jpg'))
 img = ImageTk.PhotoImage(img)
 canvas.create_image(50, 40, anchor=NW, image=img) # related height
 

@@ -76,6 +76,7 @@ class Bluetooth():
 
         while self.disconnect != True:
           if (self.send_bytes_data):
+            # can verify max length here using monocle bluetooth import, max_length() check
             await client.write_gatt_char(self.rx_char, self.send_bytes_data)
             await asyncio.sleep(0.5)
             self.send_bytes_data = None

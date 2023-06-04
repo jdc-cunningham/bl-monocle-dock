@@ -78,7 +78,7 @@ def run_app():
 
     time.sleep(5)
 
-    while (stop_app != True):
+    while (stop_app != True or ble.connected != False):
       uptime += 5
       update_status()
       time.sleep(5)

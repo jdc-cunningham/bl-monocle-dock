@@ -4,6 +4,7 @@
 import os
 import json
 import time
+import math
 
 from threading import Thread
 from bluetooth.bluetooth import Bluetooth
@@ -13,6 +14,7 @@ from PIL import Image, ImageTk
 
 ble = None
 stop_app = False
+uptime = 3
 
 # https://stackoverflow.com/a/51266275/2710227
 def resource_path(relative_path):
@@ -26,6 +28,23 @@ def resource_path(relative_path):
 def clean_res(res_str):
   return res_str.replace('OK', '').replace('\x04', '').replace('>', '')
 
+# this clock is not that accurate, there is some overlap
+# with the 3s incrementer below and the 1 - 1.5 sec loop in bluetooth.py
+def format_time(seconds):
+  if (seconds < 60):
+    return str(seconds) + 's'
+  elif (seconds >= 60 and seconds < 3600):
+    mins = math.floor(seconds / 60)
+    seconds = math.floor(seconds % 60)
+
+    return str(mins) + 'm ' + str(seconds) + 's'
+  else:
+    hours = math.floor(seconds / 3600)
+    mins = math.floor((seconds - (hours * 3600))/60)
+    seconds = seconds - ((hours * 3600) + (mins * 60))
+
+    return str(hours) + 'h ' + str(mins) + 'm ' + str(seconds) + 's'
+
 def update_status():
   ble.send_bytes_data = b'print(get_monocle_status())\x04' # this is a function flashed on monocle eg. main.py see monocle_main.py
   time.sleep(2)
@@ -37,12 +56,13 @@ def update_status():
   storage_text.config(text="Storage: " + str(status['storage']) + ' kb')
   charging_text.config(text="Charging: " + ('yes' if status['charging'] else 'no'), fg=('#AAFF00' if status['charging'] else '#D22B2B'))
   batt_level_text.config(text="Battery: " + str(status['batt']) + " %")
+  uptime_text.config(text="Uptime: " + format_time(uptime))
 
 def monocle_not_found():
   connected_text.config(text = 'Searching for monocole...')
 
 def run_app():
-  global ble
+  global ble, uptime
 
   if (ble.connected):
     connected_text.config(text='Connected')
@@ -59,6 +79,7 @@ def run_app():
     time.sleep(5)
 
     while (stop_app != True):
+      uptime += 5
       update_status()
       time.sleep(5)
 
@@ -92,7 +113,7 @@ def on_close():
 
 win = Tk()
 win.title('Monocle Dock')
-win.geometry("300x400")
+win.geometry("300x420")
 win.bg = 'white'
 win.iconbitmap(resource_path('monocle_24.ico'))
 
@@ -127,9 +148,12 @@ ram_text.place(x=150, y=20)
 storage_text = Label(frame, text="Storage:", bg='#282828', fg='#AAFF00', anchor="e")
 storage_text.place(x=150, y=40)
 
+uptime_text = Label(frame, text="Uptime:", bg='#282828', fg='#AAFF00', anchor="e")
+uptime_text.place(x=0, y=60)
+
 # manual connect/disconnect button
 connection_button = ttk.Button(frame, text= 'Disconnect' if ble and ble.connected else 'Connecting...', command=handle_connection)
-connection_button.place(x=110, y=65)
+connection_button.place(x=110, y=85)
 
 Thread(target=start_ble).start()
 

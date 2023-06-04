@@ -65,7 +65,7 @@ def run_app():
   global ble, uptime
 
   if (ble.connected):
-    connected_text.config(text='Connected')
+    connected_text.config(text='Connected', fg='#AAFF00')
     connection_button.config(text='Disconnect')
 
     ble.send_bytes_data = b'\x03\x01'
@@ -93,15 +93,21 @@ def start_ble():
   run_app()
 
 def handle_connection():
+  global stop_app, uptime
+
   if (ble.connected):
     ble.disconnect = True
+    stop_app = True
     connected_text.config(text='Disconnecting...')
     connection_button.config(text='Disconnecting...')
     time.sleep(2)
-    connected_text.config(text='Disconnected')
+    connected_text.config(text='Disconnected', fg="#D22B2B")
     connection_button.config(text='Connect')
   else:
-    start_ble()
+    uptime = 0
+    ble.disconnect = False
+    stop_app = False
+    Thread(target=start_ble).start()
 
 # handle closing Monocle Dock
 def on_close():

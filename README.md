@@ -32,6 +32,10 @@ This uses [pyinstaller](https://www.tutorialspoint.com/converting-tkinter-progra
 
 Note: the paths of the images have to be set in `MonocleDock.spec` which is produced the first time you run the above file
 
+### Issues
+
+- Monocle may not connect on first try, this is supposed to be handled by a retry in `bluetooth.py`eg. `first_conn_failed` but so far that is not working
+
 ### Disclaimer
 
 This does not consider large text being sent to the Monocle eg. entire scripts.

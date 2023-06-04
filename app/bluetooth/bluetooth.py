@@ -56,6 +56,8 @@ class Bluetooth():
     else:
       def handle_disconnect(_: BleakClient):
         print("Device was disconnected, goodbye.")
+        self.connected = False
+
         # cancelling all tasks effectively ends the program
         for task in asyncio.all_tasks():
           task.cancel()

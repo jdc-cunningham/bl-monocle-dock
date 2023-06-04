@@ -14,7 +14,6 @@ from PIL import Image, ImageTk
 
 ble = None
 stop_app = False
-uptime = 3
 
 # https://stackoverflow.com/a/51266275/2710227
 def resource_path(relative_path):
@@ -49,20 +48,32 @@ def update_status():
   ble.send_bytes_data = b'print(get_monocle_status())\x04' # this is a function flashed on monocle eg. main.py see monocle_main.py
   time.sleep(2)
   
+  if (ble.res == None):
+    print('no data from monocle')
+    ble.res = {
+      "charging": False,
+      "ram": 0,
+      "storage": 0,
+      "firmware": 'v0.0.0',
+      "batt": 0,
+      "uptime": 0
+    }
+
   status = json.loads(clean_res(ble.res.decode('utf-8')))
+  ble.res = None # reset
 
   firmware_text.config(text="Firmware: " + status['firmware'])
   ram_text.config(text="RAM: " + str(status['ram']) + ' kb')
   storage_text.config(text="Storage: " + str(status['storage']) + ' kb')
   charging_text.config(text="Charging: " + ('yes' if status['charging'] else 'no'), fg=('#AAFF00' if status['charging'] else '#D22B2B'))
   batt_level_text.config(text="Battery: " + str(status['batt']) + " %")
-  uptime_text.config(text="Uptime: " + format_time(uptime))
+  uptime_text.config(text="Uptime: " + format_time(status['uptime']))
 
 def monocle_not_found():
   connected_text.config(text = 'Searching for monocole...')
 
 def run_app():
-  global ble, uptime
+  global ble
 
   if (ble.connected):
     connected_text.config(text='Connected', fg='#AAFF00')
@@ -79,7 +90,6 @@ def run_app():
     time.sleep(5)
 
     while (stop_app != True or ble.connected != False):
-      uptime += 5
       update_status()
       time.sleep(5)
 
@@ -93,7 +103,7 @@ def start_ble():
   run_app()
 
 def handle_connection():
-  global stop_app, uptime
+  global stop_app
 
   if (ble.connected):
     ble.disconnect = True
@@ -104,7 +114,6 @@ def handle_connection():
     connected_text.config(text='Disconnected', fg="#D22B2B")
     connection_button.config(text='Connect')
   else:
-    uptime = 0
     ble.disconnect = False
     stop_app = False
     Thread(target=start_ble).start()

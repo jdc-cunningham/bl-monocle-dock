@@ -3,6 +3,9 @@ import gc
 import json
 import display
 import device
+import time
+
+boot_time = time.time()
 
 gc.collect()
 display.clear()
@@ -19,13 +22,15 @@ def get_monocle_status():
   storage = get_storage()
   ver = device.VERSION
   batt = device.battery_level()
+  uptime = time.time() - boot_time
 
   obj = {
     "charging": charging,
     "ram": ram,
     "storage": storage,
     "firmware": ver,
-    "batt": batt
+    "batt": batt,
+    "uptime": uptime
   }
 
   return json.dumps(obj)

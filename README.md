@@ -17,8 +17,8 @@ For this code to work, you need [this code](monocle_main.py) flashed onto the Mo
 ### App flow
 
 There are two main files:
-- [main.py](app\main.py)
-- [bluetooth.py](app\bluetooth\bluetooth.py)
+- [main.py](app/main.py)
+- [bluetooth.py](app/bluetooth/bluetooth.py)
 
 In `main.py` the desktop UI (dock) is built up then the app logic `start_ble` is started as a thread. In `start_ble` the connection/listener loop thread for the monocle bluetooth is started. Then the app logic `run_app`starts. At this point the dock has rendered and the monocle is either connected or it isn't. The dock will continue to try and connect to the monocle (since monocle can only be connected to one thing at a time). The connect/disconnect button is there for manual control.
 

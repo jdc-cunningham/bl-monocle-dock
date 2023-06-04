@@ -4,3 +4,4 @@
 # folders
 build/
 dist/
+__pycache__/

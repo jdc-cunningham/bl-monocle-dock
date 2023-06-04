@@ -83,6 +83,8 @@ class Bluetooth():
             self.run_app()
 
           time.sleep(1) # slow this loop down, does mean longer response time
+        else:
+          self.connected = False
 
   def start(self):
     try:

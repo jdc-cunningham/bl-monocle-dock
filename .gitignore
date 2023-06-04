@@ -1,0 +1,6 @@
+# files
+*.spec
+
+# folders
+build/
+dist/

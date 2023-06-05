@@ -47,19 +47,22 @@ def format_time(seconds):
 def update_status():
   ble.send_bytes_data = b'print(get_monocle_status())\x04' # this is a function flashed on monocle eg. main.py see monocle_main.py
   time.sleep(2)
+
+  status = {}
   
   if (ble.res == None):
     print('no data from monocle')
-    ble.res = json.dumps({ # dumb
+    status = {
       "charging": False,
       "ram": 0,
       "storage": 0,
       "firmware": 'v0.0.0',
       "batt": 0,
       "uptime": 0
-    })
+    }
+  else:
+    status = json.loads(clean_res(ble.res.decode('utf-8')))
 
-  status = json.loads(clean_res(ble.res.decode('utf-8')))
   ble.res = None # reset
 
   firmware_text.config(text="Firmware: " + status['firmware'])

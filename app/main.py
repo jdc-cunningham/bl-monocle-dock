@@ -94,7 +94,7 @@ def run_app():
 
     while (stop_app != True or ble.connected != False):
       update_status()
-      time.sleep(5)
+      time.sleep(10)
 
 def start_ble():
   global ble

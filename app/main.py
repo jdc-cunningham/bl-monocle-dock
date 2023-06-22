@@ -66,8 +66,9 @@ def update_status():
   ble.res = None # reset
 
   firmware_text.config(text="Firmware: " + status['firmware'])
-  ram_text.config(text="RAM: " + str(status['ram']) + ' kb')
-  storage_text.config(text="Storage: " + str(status['storage']) + ' kb')
+  # https://stackoverflow.com/a/45367591/2710227
+  ram_text.config(text="RAM: " + str(f"{status['ram']:,}") + ' b')
+  storage_text.config(text="Storage: " + str(f"{status['storage']:,}") + ' b')
   charging_text.config(text="Charging: " + ('yes' if status['charging'] else 'no'), fg=('#AAFF00' if status['charging'] else '#D22B2B'))
   batt_level_text.config(text="Battery: " + str(status['batt']) + " %")
   uptime_text.config(text="Uptime: " + format_time(status['uptime']))

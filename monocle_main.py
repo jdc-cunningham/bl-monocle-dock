@@ -1,3 +1,5 @@
+# this is written to monocle flash
+
 import os
 import gc
 import json
@@ -13,7 +15,7 @@ device.prevent_sleep(True)
 
 def get_storage():
   fs_stat = os.statvfs("/")
-  return str(fs_stat[0] * fs_stat[3])
+  return fs_stat[0] * fs_stat[3]
 
 def get_monocle_status():
   gc.collect()

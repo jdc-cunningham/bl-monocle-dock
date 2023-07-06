@@ -1,3 +1,11 @@
+07/05-06/2023
+
+11:29 PM
+
+trying to test the microphone, having basic problems with triggering/responding data... have done it before with master branch
+
+
+
 06/04/2023
 
 Was up for over 6 hrs, disconnected...

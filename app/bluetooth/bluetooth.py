@@ -64,6 +64,7 @@ class Bluetooth():
 
       def handle_rx(_: BleakGATTCharacteristic, data: bytearray):
         self.res = data
+        time.sleep(1)
         print("received:", data)
 
       async with BleakClient(device, disconnected_callback=handle_disconnect) as client:

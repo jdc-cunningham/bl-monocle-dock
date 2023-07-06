@@ -1,11 +1,12 @@
 import time
 import wave
+import json
 import numpy as np
 
 from bluetooth.bluetooth import Bluetooth
 from threading import Thread
 
-loop_counter = 0
+file_counter = 1
 res_counter = 0 # lazy way to avoid first response from raw mode
 ble = None
 
@@ -16,43 +17,42 @@ sample_rate     = 8000
 frequency       = 440
 duration        = 4
 
+def clean_res(res_str):
+  return res_str.replace('OK', '').replace('\x04', '').replace('>', '')
+
 def monocle_not_found():
   print('searching for monocle...')
 
 def run_app():
-  global ble, loop_counter, res_counter
+  global ble, file_counter, res_counter
 
   if (ble.connected):
     print('monocle connected')
-    ble.send_bytes_data = b'\x03\x01' # raw mode
+    ble.send_bytes_data = b'\x03\x01' # raw repl mode
+    time.sleep(2) # or this
+    print(ble.res.decode('utf-8')) # should see raw REPL; in terminal
+    ble.res = None
 
+  # record sound
   while True:
-    loop_counter += 1
+    print('what ' + str(ble.res))
+    # trigger recording to start on monocle side
+    ble.send_bytes_data = b'print(record_audio())\x04'
 
-    if (ble.res != None and res_counter == 0):
-      res_counter += 1
-      continue
+    if (ble.res == None or ble.res == b'OK'):
+      print('no data')
+    else:
+      res = json.loads(clean_res(ble.res.decode('utf-8')))
+      print(res)
 
-    if (ble.res != None or res_counter != 0):
-      print('data received')
+      # with open('myfile' + str(file_counter) + '.wav', mode='bx') as f:
+      #   f.write(res)
 
-      n = round(sample_rate/frequency)
-      t = np.linspace(0, 1/frequency, n)
-      data = (127*np.sin(2*np.pi*frequency*t)).astype(np.int8)
-      periods = round(frequency*duration)
+      # print('file written')
+      # file_counter += 1
 
-      with wave.open('test.wav', 'w') as wavfile:
-        wavfile.setnchannels(num_channels)
-        wavfile.setsampwidth(sample_width)
-        wavfile.setframerate(sample_rate)
-
-        for _ in range(periods):
-          wavfile.writeframes(data)
-
-        print('file written')
-
-    print('waiting for data ' + str(loop_counter))
-    time.sleep(1)
+    ble.res = None
+    time.sleep(2)
 
 def start_ble():
   global ble

@@ -1,38 +1,35 @@
-# this is written to monocle flash
-
-import os
-import gc
-import json
-import display
-import device
 import time
+import touch
+import microphone
+import display
+import json
 
-boot_time = time.time()
+red_rect = display.Rectangle(0, 0, 639, 400, 0xFF0000)
 
-gc.collect()
-display.clear()
-device.prevent_sleep(True)
+def record_audio():
+  display.show(red_rect)
+  microphone.record(seconds=4.0, bit_depth=8, sample_rate=8000)
+  time.sleep(0.5)
 
-def get_storage():
-  fs_stat = os.statvfs("/")
-  return fs_stat[0] * fs_stat[3]
+  samples = 2
 
-def get_monocle_status():
-  gc.collect()
-  charging = device.is_charging()
-  ram = gc.mem_free()
-  storage = get_storage()
-  ver = device.VERSION
-  batt = device.battery_level()
-  uptime = time.time() - boot_time
+  chunk1 = microphone.read(samples)
+  chunk2 = microphone.read(samples)
 
-  obj = {
-    "charging": charging,
-    "ram": ram,
-    "storage": storage,
-    "firmware": ver,
-    "batt": batt,
-    "uptime": uptime
-  }
+  display.show()
 
-  return json.dumps(obj)
+  res = {}
+
+  if chunk1 == None:
+    res = {}
+  elif chunk2 == None:
+    res = {
+      "a": str(chunk1)
+    }
+  else:
+    res = {
+      "a": str(chunk1),
+      "b": str(chunk2)
+    }
+
+  return json.dumps(res)

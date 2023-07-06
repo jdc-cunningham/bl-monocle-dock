@@ -1,5 +1,4 @@
 import time
-import touch
 import microphone
 import display
 import json
@@ -13,23 +12,20 @@ def record_audio():
 
   samples = 2
 
-  chunk1 = microphone.read(samples)
-  chunk2 = microphone.read(samples)
-
   display.show()
 
-  res = {}
+  while True:
+    audio_samples = []
 
-  if chunk1 == None:
-    res = {}
-  elif chunk2 == None:
-    res = {
-      "a": str(chunk1)
-    }
-  else:
-    res = {
-      "a": str(chunk1),
-      "b": str(chunk2)
-    }
+    chunk1 = microphone.read(samples)
+    chunk2 = microphone.read(samples)
 
-  return json.dumps(res)
+    if chunk1 == None:
+      break
+    elif chunk2 == None:
+      audio_samples.append(chunk1)
+    else:
+      audio_samples.append(chunk1)
+      audio_samples.append(chunk2)
+  
+    return json.dumps(audio_samples)

@@ -35,26 +35,32 @@ def run_app():
 
   # record sound
   while True:
-    # trigger recording to start on monocle side
-    ble.send_bytes_data = b'print(record_audio())\x04'
+    print('loop')
+    print(ble.res)
 
     if (ble.res == None or ble.res == b'OK'):
       print('no data')
+      
+      # trigger recording to start on monocle side
+      ble.send_bytes_data = b'print(record_audio())\x04'
     else:
       res = json.loads(clean_res(ble.res.decode('utf-8')))
-      
-      # dumb
-      res_a1 = res['a'].split("b'")[1]
-      res_a2 = bytes(res_a1.split("'")[0], 'utf-8')
 
-      res_b1 = res['b'].split("b'")[1]
-      res_b2 = bytes(res_b1.split("'")[0], 'utf-8')
+      print('res>')
+      print(res)
+      
+      # # dumb
+      # res_a1 = res['a'].split("b'")[1]
+      # res_a2 = bytes(res_a1.split("'")[0], 'utf-8')
+
+      # res_b1 = res['b'].split("b'")[1]
+      # res_b2 = bytes(res_b1.split("'")[0], 'utf-8')
 
       with wave.open("audio_file" + str(file_counter) + ".wav", "wb") as audiofile:
         audiofile.setsampwidth(2)
         audiofile.setnchannels(1)
         audiofile.setframerate(44100)
-        audiofile.writeframes(b''.join([res_a2, res_b2]))
+        audiofile.writeframes(b''.join(res))
 
       print('file written')
       file_counter += 1

@@ -35,7 +35,6 @@ def run_app():
 
   # record sound
   while True:
-    print('what ' + str(ble.res))
     # trigger recording to start on monocle side
     ble.send_bytes_data = b'print(record_audio())\x04'
 
@@ -43,16 +42,25 @@ def run_app():
       print('no data')
     else:
       res = json.loads(clean_res(ble.res.decode('utf-8')))
-      print(res)
+      
+      # dumb
+      res_a1 = res['a'].split("b'")[1]
+      res_a2 = bytes(res_a1.split("'")[0], 'utf-8')
 
-      # with open('myfile' + str(file_counter) + '.wav', mode='bx') as f:
-      #   f.write(res)
+      res_b1 = res['b'].split("b'")[1]
+      res_b2 = bytes(res_b1.split("'")[0], 'utf-8')
 
-      # print('file written')
-      # file_counter += 1
+      with wave.open("audio_file" + str(file_counter) + ".wav", "wb") as audiofile:
+        audiofile.setsampwidth(2)
+        audiofile.setnchannels(1)
+        audiofile.setframerate(44100)
+        audiofile.writeframes(b''.join([res_a2, res_b2]))
+
+      print('file written')
+      file_counter += 1
 
     ble.res = None
-    time.sleep(2)
+    time.sleep(1)
 
 def start_ble():
   global ble
